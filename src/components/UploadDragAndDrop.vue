@@ -2,7 +2,9 @@
 import { useDropZone } from '@vueuse/core'
 import { computed, useTemplateRef, watch } from 'vue'
 import { useGitData } from '../stores/useGitData'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const dropzone = useTemplateRef('dropzone')
 const { isOverDropZone, files } = useDropZone(dropzone, {
   dataTypes: ['application/json'],
@@ -22,7 +24,10 @@ const borderColor = computed(() => {
 const { loadData } = useGitData()
 
 async function loadFile(file?: File | null) {
-  if (file) loadData(JSON.parse(await file.text()))
+  if (file) {
+    loadData(JSON.parse(await file.text()))
+    router.push({ path: '/graphs' })
+  }
 }
 </script>
 
@@ -49,6 +54,8 @@ async function loadFile(file?: File | null) {
 </template>
 
 <style lang="scss" scoped>
+@use 'sass:color';
+
 .dropzone {
   flex: 1;
   display: flex;
@@ -66,7 +73,8 @@ async function loadFile(file?: File | null) {
   transition: all 200ms ease-in-out;
 
   &:hover {
-    background-color: lighten(#0f0f0f, 1%);
+    background-color: color.adjust(#0f0f0f, $lightness: 1%, $space: hsl);
+    //background-color: lighten(#0f0f0f, 1%);
     border-color: var(--inputBorderHover);
     color: var(--text);
   }
